@@ -9,5 +9,5 @@ reports/
 # virtualenv
 .venv
 
-# nodejs 
+# nodejs
 node_modules
