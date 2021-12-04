@@ -7,10 +7,11 @@ import styles from "../styles/Home.module.css";
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { AbiItem } from "web3-utils";
+import { Contract } from "web3-eth-contract";
 
 // Assumes a deployed contract address. #HACKATHON
 const contractAddress = "0x4de47BA468ec1F2a4a1E1f507512178ECd86803b";
-
+import contractAbi from "../../interfaces/abi/PhysicalAddressValidation.abi";
 // We will somehow need to get the abi
 
 const QrReader = dynamic(() => import("react-qr-reader"), {
