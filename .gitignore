@@ -2,7 +2,8 @@ __pycache__
 .env
 .history
 .hypothesis/
-build/
+build/deployments
+build/interfaces
 reports/
 
 # virtualenv
