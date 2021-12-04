@@ -40,6 +40,7 @@ contract PhysicalAddressValidation {
         // ensure that the token has not already been used, and that it matches up with the physical address provided as an arg to this function
         // TODO: lookup the ETH address from the physical address hash
         // TODO: verify the proof of address is signed by the eth address
+
     }
     // external function to add one-time use token, BUT make sure that to validate it can only be called by the contract creator.
 }
