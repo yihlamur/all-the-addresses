@@ -4,8 +4,14 @@ import Web3 from "web3";
 import { injected } from "../components/wallets/connectors";
 import styles from "../styles/Home.module.css";
 // import QrReader from "react-qr-reader";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import { AbiItem } from "web3-utils";
+
+// Assumes a deployed contract address. #HACKATHON
+const contractAddress = "0x4de47BA468ec1F2a4a1E1f507512178ECd86803b";
+
+// We will somehow need to get the abi
 
 const QrReader = dynamic(() => import("react-qr-reader"), {
   ssr: false,
@@ -24,6 +30,20 @@ const Home: NextPage = () => {
   const connect = async () => activate(injected);
   const disconnect = async () => deactivate();
   const [qrCode, setQrCode] = useState<QrCode>();
+  const [contract, setContract] = useState<Contract>();
+
+  useEffect(() => {
+    if (!library) return;
+
+    (async function getContract() {
+      const contract = new library!.eth.Contract(
+        contractAbi.abi as unknown as AbiItem,
+        contractAddress
+      );
+      setContract(contract);
+    })();
+  }, [library]);
+
   // Scan a QR code
   // Input the QR code data into a form (optional?)
   // Upon QR scan (plus some data validation), initiate a call to the contract via Metamask
