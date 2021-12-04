@@ -3,25 +3,39 @@
 pragma solidity ^0.8.0;
 
 contract PhysicalAddressValidation {
-    uint256 zipCode;
+    string neighborhood;
 
     struct tokenInfo {
-        bool used;
-        string physicalAddress;
+        uint256 nonce;
+        address ethAddress;
     }
+
     // String for now, but maybe USPS has an abstract unique ID for address. In which case we should use that
     mapping(address => string) public onChainToPhysicalAddresses;
 
     mapping(string => tokenInfo) public oneTimeUseTokens;
 
-    constructor(uint256 _zipCode) {
-        zipCode = _zipCode;
+    constructor(string memory _neighborhood) {
+        neighborhood = _neighborhood;
+    }
+
+    function getNonceForAddress(
+        string memory physicalAddressHash,
+        address ethAddress
+    ) public returns (uint256) {
+        // TODO: ensure that only trusted USPS address can call this
+        // for prod apps you want to use a verifiable randomness oracle rather than use previous block number
+        uint256 notsecurenonce = uint256(blockhash(block.number-1));
+        // currently it just overrides the old address hash for the user
+        // so only one user at the address can generate a nonce
+        oneTimeUseTokens[physicalAddressHash] = tokenInfo(notsecurenonce, ethAddress);
+        return notsecurenonce;
     }
 
     function registerAddress(
-        string memory token,
-        string memory physicalAddress,
-        address residentAddress
+        string memory jwsHash,
+        uint256 notsecurenonce,
+        string memory proofOfAddress //signature of the hash of the jws
     ) public {
         // ensure that the token has not already been used, and that it matches up with the physical address provided as an arg to this function
     }
