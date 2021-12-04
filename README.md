@@ -5,7 +5,7 @@
 3. Narrator: The QR code has two pieces of information:
     - The address of USPS's contract for that ZIP code
     - The address that the QR code was sent to
-    - A unique single-use token
+    - A unique single-use token: makes sure that address mapping function can only be called by the person that received the QR code.
 4. It opens a website, hosted by USPS that pops up metamask
 5. Pressing a button on the website initiates a transaction, whose author needs to be USPS. Inputs to the function are, the physical address, and the end user's chain address
 
