@@ -1,13 +1,13 @@
 {
   "contracts": {
-    "PhysicalAddressValidation": "b0690499aca58d6d068866b171f3c3aea08ef89e"
+    "PhysicalAddressValidation": "9d26fc1ff1e4d1085104f8ccca8eeb432f3031a3"
   },
   "tests": {
     "tests/test_register_physical_address.py": {
       "coverage": false,
       "isolated": false,
-      "results": ".",
-      "sha1": "139bfcc08b73478692b4bb668cb7f3fa61f08abd",
+      "results": "..",
+      "sha1": "6997f86ed187547d0b86c10a9fe95c6420fd494a",
       "txhash": []
     }
   },

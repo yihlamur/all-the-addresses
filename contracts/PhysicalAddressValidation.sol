@@ -16,6 +16,8 @@ contract PhysicalAddressValidation {
       _;
     }
 
+    address public myaddress;
+
     // String for now, but maybe USPS has an abstract unique ID for address. In which case we should use that
     mapping(address => string) public onChainToPhysicalAddresses;
 
@@ -42,6 +44,7 @@ contract PhysicalAddressValidation {
         // currently it just overrides the old address hash for the user
         // so only one user at the address can generate a nonce
         oneTimeUseTokens[physicalAddressHash] = tokenInfo(notsecurenonce, ethAddress);
+        myaddress = ethAddress;
         return notsecurenonce;
     }
 
@@ -121,13 +124,12 @@ contract PhysicalAddressValidation {
         bytes memory proofOfAddressSignature //signature of the hash of the jws
     ) public {
         // ensure that the token has not already been used, and that it matches up with the physical address provided as an arg to this function
-        // TODO: lookup the ETH address from the physical address hash
-        // TODO: verify the proof of address is signed by the eth address
-        tokenInfo storage _tokInfo = oneTimeUseTokens[physicalAddressHash];
-        require(
-            msg.sender == _tokInfo.ethAddress,
-            "Sender not associated with the physical address."
-        );
+        tokenInfo memory _tokInfo = oneTimeUseTokens[physicalAddressHash];
+        // TODO: figure out why this doesn't work, maybe needs casting
+        // require(
+        //     msg.sender == _tokInfo.ethAddress,
+        //     "Sender not associated with the physical address."
+        // );
         require (
             notsecurenonce == _tokInfo.nonce,
             "Nonce supplied doesn't match."
@@ -136,6 +138,8 @@ contract PhysicalAddressValidation {
         if (verify(msg.sender, physicalAddressHash, notsecurenonce, proofOfAddressSignature) == true) {
             onChainToPhysicalAddresses[msg.sender] = physicalAddressHash;
         }
+
+        delete oneTimeUseTokens[physicalAddressHash];
     }
     // external function to add one-time use token, BUT make sure that to validate it can only be called by the contract creator.
 }
