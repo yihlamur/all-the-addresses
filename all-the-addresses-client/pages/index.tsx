@@ -10,7 +10,7 @@ import { AbiItem } from "web3-utils";
 import { Contract } from "web3-eth-contract";
 
 // Assumes a deployed contract address. #HACKATHON
-const contractAddress = "0x6024A9F2A435651b28DC9ecc6E8AB0D59dA12F67";
+const contractAddress = "0x26Ef401c4f625E7970278441518e3Eed49787Ac0";
 import contractAbi from "../../build/contracts/PhysicalAddressValidation.json";
 // We will somehow need to get the abi
 
@@ -36,6 +36,24 @@ const Home: NextPage = () => {
   const [isConfirmed, setIsConfirmed] = useState<boolean>(false);
   const [isScanned, setIsScanned] = useState<boolean>(false);
 
+  //   useEffect(() => {
+  //     (async function () {
+  //       console.log("before dom exception?");
+  //       const algorithm = "ES256";
+  //       const spki = `-----BEGIN PUBLIC KEY-----
+  // MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu3UssCaCigKP2nzLcgDz
+  // ItCsIdqo+QpKFw1zLHzCy900xOYC4GyKxoss0YXSgUATi4zanYY7nIF5D2Nn5t3+
+  // WCauML346vwpmk4WdJcVo4x5dYAZ8ZEMeI7ZLkTyhaxe56oVjszkceW2Hj9PCjxO
+  // jguz/+50OFJaljzJmQc3MTG8+fNx3tlh2/AR+KWAPxw6SSGCeRjWwrxSB8X+bRWZ
+  // lwufpkfz22z0i71Yt5ABY/323OMOsVVHu6kdperSmybKkVjNzFnISyjIxi9YEKhh
+  // 0Si9uh9gKopvFyuE/BnLrZ48YP3v3cTNV/rRy804Z7AUD9I0JKNah0oTLiY4ynwZ
+  // IQIDAQAB
+  // -----END PUBLIC KEY-----`;
+  //       const ecPublicKey = await jose.importSPKI(spki, algorithm);
+  //       console.log("ecPublicKey", ecPublicKey);
+  //     })();
+  //   }, []);
+
   useEffect(() => {
     if (!library) return;
 
@@ -49,12 +67,28 @@ const Home: NextPage = () => {
   }, [library]);
   console.log("contract", contract);
   const mapAddress = async (qrCode: QrCode) => {
-    const { physicalAddressHash, notsecurenonce, proofOfAddressSignature } =
-      qrCode;
-    console.log(physicalAddressHash, notsecurenonce, proofOfAddressSignature);
+    // const { physicalAddressHash, notsecurenonce, proofOfAddressSignature } =
+    //   qrCode;
+    const physicalAddressHash = "27 South Park";
+    const notsecurenonce =
+      BigInt(
+        91903244880640089683750221547850482788364732980300540907126097277003523592996
+      );
+    // const proofOfAddressSignature = library?.eth.abi.encodeParameters(
+    //   ["string", "uint256"],
+    //   [
+    //     physicalAddressHash,
+    //     9106623947899129220758414257994314916107783387136329768872248772220295369560,
+    //   ]
+    // );
+    // console.log(physicalAddressHash, notsecurenonce, proofOfAddressSignature);
+    // const theActualPayload = library?.eth.sign(
+    //   proofOfAddressSignature,
+    //   account
+    // );
     try {
       await contract?.methods
-        .registerAddress("physicalAddressHash", 1234, 0x1234123)
+        .registerAddress(physicalAddressHash, notsecurenonce)
         .send({ from: account, gas: 2100000 })
         .on(
           "receipt",
