@@ -10,11 +10,9 @@ import { AbiItem } from "web3-utils";
 import { Contract } from "web3-eth-contract";
 
 // Assumes a deployed contract address. #HACKATHON
-const contractAddress = "0x4de47BA468ec1F2a4a1E1f507512178ECd86803b";
+const contractAddress = "0x6024A9F2A435651b28DC9ecc6E8AB0D59dA12F67";
 import contractAbi from "../../build/contracts/PhysicalAddressValidation.json";
 // We will somehow need to get the abi
-
-const postOfficePubicKey = "asdf";
 
 const QrReader = dynamic(() => import("react-qr-reader"), {
   ssr: false,
@@ -26,7 +24,7 @@ interface QrCode {
   physicalAddressHash: string;
   addressMetadata: string;
   notsecurenonce: string;
-  proofOfAddress: string;
+  proofOfAddressSignature: string;
 }
 
 const Home: NextPage = () => {
@@ -51,12 +49,17 @@ const Home: NextPage = () => {
   }, [library]);
   console.log("contract", contract);
   const mapAddress = async (qrCode: QrCode) => {
-    const { physicalAddressHash, notsecurenonce, proofOfAddress } = qrCode;
+    const { physicalAddressHash, notsecurenonce, proofOfAddressSignature } =
+      qrCode;
+    console.log(physicalAddressHash, notsecurenonce, proofOfAddressSignature);
     try {
       await contract?.methods
-        .registerAddress(physicalAddressHash, notsecurenonce, proofOfAddress)
-        .send({ from: account })
-        .on("receipt", () => setIsConfirmed(true));
+        .registerAddress("physicalAddressHash", 1234, 0x1234123)
+        .send({ from: account, gas: 2100000 })
+        .on(
+          "receipt",
+          (thing) => console.log("thing", thing) || setIsConfirmed(true)
+        );
     } catch (error) {
       console.log("error", error);
       console.log("error", (error as any).data);
@@ -95,6 +98,13 @@ const Home: NextPage = () => {
         />
       )}
 
+      <button
+        onClick={async () => {
+          mapAddress({} as QrCode);
+        }}
+      >
+        test
+      </button>
       {isConfirmed && <div>OMG congrats, we did it team!</div>}
     </div>
   );
