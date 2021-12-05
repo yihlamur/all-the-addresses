@@ -9,20 +9,15 @@ import dynamic from "next/dynamic";
 import { AbiItem } from "web3-utils";
 import { Contract } from "web3-eth-contract";
 
-// Assumes a deployed contract address. #HACKATHON
 const contractAddress = "0x66c99c42e3Ebf685888696e990272092d8d5B82D";
 import contractAbi from "../../build/contracts/PhysicalAddressValidation.json";
-// We will somehow need to get the abi
 
 const QrReader = dynamic(() => import("react-qr-reader"), {
   ssr: false,
 });
 
 interface QrCode {
-  publicKey: string;
-  nonce: string;
   physicalAddressHash: string;
-  addressMetadata: string;
   notsecurenonce: string;
   proofOfAddressSignature: string;
 }
@@ -35,24 +30,6 @@ const Home: NextPage = () => {
   const [contract, setContract] = useState<Contract>();
   const [isConfirmed, setIsConfirmed] = useState<boolean>(false);
   const [isScanned, setIsScanned] = useState<boolean>(false);
-
-  //   useEffect(() => {
-  //     (async function () {
-  //       console.log("before dom exception?");
-  //       const algorithm = "ES256";
-  //       const spki = `-----BEGIN PUBLIC KEY-----
-  // MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu3UssCaCigKP2nzLcgDz
-  // ItCsIdqo+QpKFw1zLHzCy900xOYC4GyKxoss0YXSgUATi4zanYY7nIF5D2Nn5t3+
-  // WCauML346vwpmk4WdJcVo4x5dYAZ8ZEMeI7ZLkTyhaxe56oVjszkceW2Hj9PCjxO
-  // jguz/+50OFJaljzJmQc3MTG8+fNx3tlh2/AR+KWAPxw6SSGCeRjWwrxSB8X+bRWZ
-  // lwufpkfz22z0i71Yt5ABY/323OMOsVVHu6kdperSmybKkVjNzFnISyjIxi9YEKhh
-  // 0Si9uh9gKopvFyuE/BnLrZ48YP3v3cTNV/rRy804Z7AUD9I0JKNah0oTLiY4ynwZ
-  // IQIDAQAB
-  // -----END PUBLIC KEY-----`;
-  //       const ecPublicKey = await jose.importSPKI(spki, algorithm);
-  //       console.log("ecPublicKey", ecPublicKey);
-  //     })();
-  //   }, []);
 
   useEffect(() => {
     if (!library) return;
@@ -77,12 +54,7 @@ const Home: NextPage = () => {
           setIsConfirmed(true);
         });
     } catch (error) {
-      console.log("error", error);
-      console.log("error", (error as any).data);
-      const message = JSON.parse(
-        (error as any).message.substring(15).trim()
-      ).message;
-      console.log("message", message);
+      console.error(error);
     }
   };
 
@@ -104,23 +76,12 @@ const Home: NextPage = () => {
           onScan={async (data: any) => {
             if (!data || isScanned) return;
             setIsScanned(true);
-            // The data will be signed with a private key
-            // Verify this using the public key
-            // setQrCode(JSON.parse(data) as QrCode);
             const qrCode = JSON.parse(data) as QrCode;
             await mapAddress(qrCode);
           }}
           style={{ width: "20%" }}
         />
       )}
-
-      <button
-        onClick={async () => {
-          mapAddress({} as QrCode);
-        }}
-      >
-        test
-      </button>
       {isConfirmed && <div>OMG congrats, we did it team!</div>}
     </div>
   );
