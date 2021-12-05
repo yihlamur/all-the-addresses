@@ -10,7 +10,7 @@ import { AbiItem } from "web3-utils";
 import { Contract } from "web3-eth-contract";
 
 // Assumes a deployed contract address. #HACKATHON
-const contractAddress = "0x26Ef401c4f625E7970278441518e3Eed49787Ac0";
+const contractAddress = "0x66c99c42e3Ebf685888696e990272092d8d5B82D";
 import contractAbi from "../../build/contracts/PhysicalAddressValidation.json";
 // We will somehow need to get the abi
 
@@ -67,33 +67,15 @@ const Home: NextPage = () => {
   }, [library]);
   console.log("contract", contract);
   const mapAddress = async (qrCode: QrCode) => {
-    // const { physicalAddressHash, notsecurenonce, proofOfAddressSignature } =
-    //   qrCode;
-    const physicalAddressHash = "27 South Park";
-    const notsecurenonce =
-      BigInt(
-        91903244880640089683750221547850482788364732980300540907126097277003523592996
-      );
-    // const proofOfAddressSignature = library?.eth.abi.encodeParameters(
-    //   ["string", "uint256"],
-    //   [
-    //     physicalAddressHash,
-    //     9106623947899129220758414257994314916107783387136329768872248772220295369560,
-    //   ]
-    // );
-    // console.log(physicalAddressHash, notsecurenonce, proofOfAddressSignature);
-    // const theActualPayload = library?.eth.sign(
-    //   proofOfAddressSignature,
-    //   account
-    // );
+    const { physicalAddressHash, notsecurenonce } = qrCode;
     try {
       await contract?.methods
         .registerAddress(physicalAddressHash, notsecurenonce)
         .send({ from: account, gas: 2100000 })
-        .on(
-          "receipt",
-          (thing) => console.log("thing", thing) || setIsConfirmed(true)
-        );
+        .on("confirmation", function (confirmationNumber, receipt) {
+          console.log(confirmationNumber, receipt);
+          setIsConfirmed(true);
+        });
     } catch (error) {
       console.log("error", error);
       console.log("error", (error as any).data);
