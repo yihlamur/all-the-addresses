@@ -3,11 +3,17 @@
 pragma solidity ^0.8.0;
 
 contract PhysicalAddressValidation {
-    string neighborhood;
+    string public neighborhood;
+    address owner;
 
     struct tokenInfo {
         uint256 nonce;
         address ethAddress;
+    }
+
+    modifier _ownerOnly() {
+      require(msg.sender == owner);
+      _;
     }
 
     // String for now, but maybe USPS has an abstract unique ID for address. In which case we should use that
@@ -17,6 +23,7 @@ contract PhysicalAddressValidation {
 
     constructor(string memory _neighborhood) {
         neighborhood = _neighborhood;
+        owner = msg.sender;
     }
 
     function getMessageHash(
@@ -29,8 +36,7 @@ contract PhysicalAddressValidation {
     function getNonceForAddress(
         string memory physicalAddressHash,
         address ethAddress
-    ) public returns (uint256) {
-        // TODO: ensure that only trusted USPS address can call this
+    ) public _ownerOnly returns (uint256) {
         // for prod apps you want to use a verifiable randomness oracle rather than use previous block number
         uint256 notsecurenonce = uint256(blockhash(block.number-1));
         // currently it just overrides the old address hash for the user
