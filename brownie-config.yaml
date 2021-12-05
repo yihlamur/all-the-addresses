@@ -1,0 +1,12 @@
+dotenv: .env
+networks:
+  rinkeby:
+    verify: true
+  rinkeby-alchemy:
+    verify: true
+  development:
+    verify: false
+
+wallets:
+  address: ${ADDRESS}
+  from_key: ${PRIVATE_KEY}
