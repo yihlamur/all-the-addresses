@@ -6,8 +6,8 @@
     "tests/test_register_physical_address.py": {
       "coverage": false,
       "isolated": false,
-      "results": "..",
-      "sha1": "6997f86ed187547d0b86c10a9fe95c6420fd494a",
+      "results": "F",
+      "sha1": "56217ec023273a2669ba8387caf5fd9b63ac5336",
       "txhash": []
     }
   },

@@ -9,4 +9,4 @@ def get_account():
 
 def main():
     account = get_account()
-    return PhysicalAddressValidation.deploy('South Park', {'from': account})
+    return PhysicalAddressValidation.deploy('South Park', {'from': account}, publish_source=True)
