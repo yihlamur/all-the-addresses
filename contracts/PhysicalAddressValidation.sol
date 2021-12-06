@@ -44,7 +44,6 @@ contract PhysicalAddressValidation {
         // currently it just overrides the old address hash for the user
         // so only one user at the address can generate a nonce
         oneTimeUseTokens[physicalAddressHash] = tokenInfo(notsecurenonce, ethAddress);
-        myaddress = ethAddress;
         return notsecurenonce;
     }
 
@@ -120,8 +119,7 @@ contract PhysicalAddressValidation {
 
     function registerAddress(
         string memory physicalAddressHash,
-        uint256 notsecurenonce, 
-        bytes memory proofOfAddressSignature //signature of the hash of the jws
+        uint256 notsecurenonce
     ) public {
         // ensure that the token has not already been used, and that it matches up with the physical address provided as an arg to this function
         tokenInfo memory _tokInfo = oneTimeUseTokens[physicalAddressHash];
@@ -134,10 +132,11 @@ contract PhysicalAddressValidation {
             notsecurenonce == _tokInfo.nonce,
             "Nonce supplied doesn't match."
         );
-        // if verify succeeded, store the sender address on chain
-        if (verify(msg.sender, physicalAddressHash, notsecurenonce, proofOfAddressSignature) == true) {
-            onChainToPhysicalAddresses[msg.sender] = physicalAddressHash;
-        }
+        // TODO: this isn't strictly needed
+        // // if verify succeeded, store the sender address on chain
+        // if (verify(msg.sender, physicalAddressHash, notsecurenonce, proofOfAddressSignature) == true) {
+        //     onChainToPhysicalAddresses[msg.sender] = physicalAddressHash;
+        // }
 
         delete oneTimeUseTokens[physicalAddressHash];
     }
