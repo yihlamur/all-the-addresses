@@ -14,7 +14,7 @@ def w3(web3):
     return Web3(Web3.HTTPProvider())
 
 def test_get_nonce_for_hash_returns_last_block(w3, contract, accounts):
-    block = w3.eth.getBlock('latest')
+    block = w3.eth.get_block('latest')
     blockAsInt = int(block.hash.hex(), 16)
     physicalAddressHash = Web3.keccak(text='Test').hex()[1:] # strip the 0x
     tx = contract.getNonceForAddress(physicalAddressHash, accounts[1], {'from': accounts[0]})
@@ -29,15 +29,12 @@ def test_register_address(w3, contract, accounts):
     print(userAccount.address)
     tx = contract.getNonceForAddress(physicalAddressHash, userAccount.address, {'from': accounts[0]})
     tx.wait(required_confs=1)
-    print("myaddress",contract.myaddress)
     nonce = tx.return_value
-    # jsonobject = json.dumps({
-    #     "physicalAddressHash": physicalAddressHash,
-    #     "nonce": nonce
-    # })
     encodedABI = encode_abi(['string', 'uint256'], [physicalAddressHash, nonce])
     # encodedABIObject = encode_defunct(encodedABI)
     signedMessage = userAccount.sign_defunct_message(encodedABI.hex())
     # call as the user
-    tx2 = contract.registerAddress(physicalAddressHash, nonce, signedMessage.signature)
+    tx2 = contract.registerAddress(physicalAddressHash, nonce, signedMessage.signature, {'from': userAccount})
     tx2.wait(required_confs=1)
+    # confirm onchain address
+    assert contract.isResident(userAccount.address)

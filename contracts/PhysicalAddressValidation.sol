@@ -22,6 +22,8 @@ contract PhysicalAddressValidation {
     //  hashed physical address => tokenInfo struct instance (nonce + end-user eth address)
     mapping(string => tokenInfo) public oneTimeUseTokens;
 
+    address public myaddress;
+
     constructor(string memory _neighborhood) {
         neighborhood = _neighborhood;
         owner = msg.sender;
@@ -46,6 +48,7 @@ contract PhysicalAddressValidation {
             notsecurenonce,
             ethAddress
         );
+        myaddress = ethAddress;
         return notsecurenonce;
     }
 
@@ -124,33 +127,38 @@ contract PhysicalAddressValidation {
         return recoverSigner(ethSignedMessageHash, signature) == _signer;
     }
 
+    function isResident(address ethAddress) public view returns (bool) {
+        return  bytes(onChainToPhysicalAddresses[ethAddress]).length > 0 ;
+    }
+
     function registerAddress(
         string memory physicalAddressHash,
-        uint256 notsecurenonce
+        uint256 notsecurenonce,
+        bytes memory proofOfAddressSignature
     ) public {
         // bytes memory proofOfAddressSignature //signature of the hash of the jws
         // ensure that the token has not already been used, and that it matches up with the physical address provided as an arg to this function
         // TODO: lookup the ETH address from the physical address hash
         // TODO: verify the proof of address is signed by the eth address
         tokenInfo storage _tokInfo = oneTimeUseTokens[physicalAddressHash];
-        // require(
-        //     msg.sender == _tokInfo.ethAddress,
-        //     "Sender not associated with the physical address."
-        // );
         require(
             notsecurenonce == _tokInfo.nonce,
             "Nonce supplied doesn't match."
         );
+        require(
+            msg.sender == myaddress,
+            "Sender not associated with the physical address."
+        );
         // if verify succeeded, store the sender address on chain
-        // if (
-        //     verify(
-        //         msg.sender,
-        //         physicalAddressHash,
-        //         notsecurenonce,
-        //         proofOfAddressSignature
-        //     ) == true
-        // ) {
-        // }
+        if (
+            verify(
+                msg.sender,
+                physicalAddressHash,
+                notsecurenonce,
+                proofOfAddressSignature
+            ) == true
+        ) {
+        }
         onChainToPhysicalAddresses[msg.sender] = physicalAddressHash;
     }
     // external function to add one-time use token, BUT make sure that to validate it can only be called by the contract creator.
